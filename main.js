@@ -65,12 +65,13 @@ function popolateContainer() {
     for (let i = 0; i < posts.length; i++) {
         const {content, media, author, created,likes} = posts[i];
         const data = takeDate(created);
+        const profileImage = takeProfileImage(author);
         items +=
         `<div class="post">
         <div class="post__header">
             <div class="post-meta">                    
                 <div class="post-meta__icon">
-                    <img class="profile-pic" src="${author.image}" alt="${author.name}">                    
+                    ${profileImage}         
                 </div>
                 <div class="post-meta__data">
                     <div class="post-meta__author">${author.name}</div>
@@ -99,10 +100,27 @@ function popolateContainer() {
     }
     container.innerHTML = items;
 }
+
+// funzione per calcolare quanti mesi fa è stato pubblicato il post
 function takeDate(created) {
     let postMonth = parseInt(created[5] + created[6]);
     const todayDate = new Date();
     const todayMonth = todayDate.getMonth() + 1
     postMonth = todayMonth - postMonth;
     return postMonth;
+}
+// funzione per creare l'icona del profilo
+function takeProfileImage(author) {
+    const {name, image} = author;
+    if (image == null) {
+        const firstLetter = name[0];
+        let secondLetter = '';
+        for (let i = 0; i < name.length; i++) {
+            if (name[i] == " ") {
+                secondLetter = name[i + 1];
+            }
+        }
+        return profileImage = `<div class="profile-pic-default"><span>${firstLetter + secondLetter}</span></div>`;
+    }
+    return profileImage = `<img class="profile-pic" src="${image}" alt="${name}">`;
 }
