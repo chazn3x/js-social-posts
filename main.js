@@ -63,7 +63,8 @@ function popolateContainer() {
     const container = document.getElementById("container");
     let items = '';
     for (let i = 0; i < posts.length; i++) {
-        const {content, media, author, likes, created} = posts[i];
+        const {content, media, author, created,likes} = posts[i];
+        const data = takeDate(created);
         items +=
         `<div class="post">
         <div class="post__header">
@@ -73,7 +74,7 @@ function popolateContainer() {
                 </div>
                 <div class="post-meta__data">
                     <div class="post-meta__author">${author.name}</div>
-                    <div class="post-meta__time">${created}</div>
+                    <div class="post-meta__time">${data} mesi fa</div>
                 </div>                    
             </div>
         </div>
@@ -97,4 +98,11 @@ function popolateContainer() {
     </div>`;        
     }
     container.innerHTML = items;
+}
+function takeDate(created) {
+    let postMonth = parseInt(created[5] + created[6]);
+    const todayDate = new Date();
+    const todayMonth = todayDate.getMonth() + 1
+    postMonth = todayMonth - postMonth;
+    return postMonth;
 }
