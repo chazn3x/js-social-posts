@@ -56,15 +56,100 @@ const posts = [
     }
 ];
 
-
+arrayReorder(posts);
 popolateContainer();
 
+// creazione nuovo post
+const post = document.getElementById("create-post");
+post.addEventListener("click", function () {
+    const newAuthor = {
+        name: document.getElementById("new-author").innerHTML,
+        image: null        };
+    const newId = posts.length + 1;
+    const newContent = document.getElementById("new-post-text").value;
+    const newMedia = null;
+    const newLikes = 0;
+    const data = new Date();
+    const year = data.getFullYear();
+    const month = ("00" + (data.getMonth() + 1)).slice(-2);
+    const day = ("00" + (data.getDate())).slice(-2);
+    const hour = data.getHours();
+    const minutes = data.getMinutes() + 1;
+    const created = year + "-" + month + "-" + day;
+    const newPost = {
+        "id": newId,
+        "content": newContent,
+        "media": newMedia,
+        "author": newAuthor,
+        "likes": newLikes,
+        "created": created,
+        "time": {
+            hour: hour,
+            minutes: minutes
+        }
+    }
+    const postData = document.getElementsByClassName("new-post-data");
+    for (let i = 0; i < postData.length; i++) {
+        const newData = new Date;
+        const newHour = newData.getHours() - posts[i].time.hour;
+        const newMinutes = (newData.getMinutes() + 1) - posts[i].time.minutes;
+        if (newHour == 0) {
+            if (newMinutes == 0) {
+                postData[postData.length - 1 - i].innerHTML = "Poco fa";
+            } else if (newMinutes == 1) {
+                postData[postData.length - 1 - i].innerHTML = newMinutes + " minuto fa";
+            } else {
+                postData[postData.length - 1 - i].innerHTML = newMinutes + " minuti fa";
+            }
+        } else {
+            postData[postData.length - 1 - i].innerHTML = newHour + " ore fa";
+        }
+    }
+    posts.push(newPost);
+    arrayReorder(posts);
+    let newPostDiv = document.createElement("div");
+    newPostDiv.classList.add("post");
+    const profileImage = takeProfileImage(newAuthor);
+    newPostDiv.innerHTML =
+    `<div class="post__header">
+        <div class="post-meta">                    
+            <div class="post-meta__icon">
+                ${profileImage}         
+            </div>
+            <div class="post-meta__data">
+                <div class="post-meta__author">${newAuthor.name}</div>
+                <div class="post-meta__time"><span class="new-post-data">Adesso</span>, ${posts[0].newCreated.itaDate}</div>
+            </div>                    
+        </div>
+    </div>
+    <div class="post__text">${newContent}</div>
+    <div class="post__image">
+        <img src="${newMedia}" alt="">
+    </div>
+    <div class="post__footer">
+        <div class="likes js-likes">
+            <div class="likes__cta">
+                <button class="like-button  js-like-button" data-postid="${newId}">
+                    <i class="like-button__icon fas fa-thumbs-up" aria-hidden="true"></i>
+                    <span class="like-button__label">Mi Piace</span>
+                </button>
+            </div>
+            <div class="likes__counter">
+                Piace a <b id="like-counter-${newId}" class="js-likes-counter">${newLikes}</b> persone
+            </div>
+        </div> 
+    </div>`;
+    const container = document.getElementById("container");
+    container.prepend(newPostDiv);
+    addLikes();
+    document.getElementById("new-post-text").value = "";
+});
+// funzione per inserire i post iniziali
 function popolateContainer() {
     const container = document.getElementById("container");
     let items = '';
     for (let i = 0; i < posts.length; i++) {
-        const {id, content, media, author, created,likes} = posts[i];
-        const data = takeDate(created);
+        const {id, content, media, author, newCreated,likes} = posts[i];
         const profileImage = takeProfileImage(author);
         items +=
         `<div class="post">
@@ -75,7 +160,7 @@ function popolateContainer() {
                     </div>
                     <div class="post-meta__data">
                         <div class="post-meta__author">${author.name}</div>
-                        <div class="post-meta__time">${data} mesi fa</div>
+                        <div class="post-meta__time">${takeDate(newCreated)} mesi fa, ${newCreated.itaDate}</div>
                     </div>                    
                 </div>
             </div>
@@ -101,12 +186,11 @@ function popolateContainer() {
     container.innerHTML = items;
     addLikes();
 }
-
 // funzione per calcolare quanti mesi fa è stato pubblicato il post
-function takeDate(created) {
-    let postMonth = parseInt(created[5] + created[6]);
+function takeDate(newCreated) {
+    let postMonth = newCreated.month;
     const todayDate = new Date();
-    const todayMonth = todayDate.getMonth() + 1
+    const todayMonth = todayDate.getMonth() + 1;
     postMonth = todayMonth - postMonth;
     return postMonth;
 }
@@ -127,10 +211,11 @@ function takeProfileImage(author) {
 }
 // funzione per i mi piace
 function addLikes() {
-    const likeBtn = document.getElementsByClassName("like-button");
-    for (let i = 0; i < likeBtn.length; i++) {
-        likeBtn[i].addEventListener("click", function () {
-            const likeCounter = document.getElementById(`like-counter-${i + 1}`);
+    for (let i = 0; i < posts.length; i++) {
+        const {id} = posts[i];
+        const likeBtn = document.querySelector(`[data-postid="${id}"]`);
+        likeBtn.addEventListener("click", function () {
+            const likeCounter = document.getElementById(`like-counter-${id}`);
             let likeInt = parseInt(likeCounter.innerHTML);
             if (!(this.classList.contains("like-button--liked"))) {
                 this.classList.add("like-button--liked");
@@ -142,4 +227,77 @@ function addLikes() {
             likeCounter.innerHTML = likeInt;
         });
     }
+}
+// funzione per ordinare array per data di pubblicazione
+function arrayReorder(posts) {
+    for (let i = 0; i < posts.length; i++) {
+        const {created} = posts[i];
+        const postYear = parseInt(created[0] + created[1] + created[2] + created[3]);
+        const postMonth = parseInt(created[5] + created[6]);
+        const postDay = parseInt(created[8] + created[9]);
+        let printMonth = '';
+        switch (postMonth) {
+            case 1:
+                printMonth = "Gennaio";
+                break;
+            case 2:
+                printMonth = "Febbraio";
+                break;
+            case 3:
+                printMonth = "Marzo";
+                break;
+            case 4:
+                printMonth = "Aprile";
+                break;
+            case 5:
+                printMonth = "Maggio";
+                break;
+            case 6:
+                printMonth = "Giugno";
+                break;
+            case 7:
+                printMonth = "Luglio";
+                break;
+            case 8:
+                printMonth = "Agosto";
+                break;
+            case 9:
+                printMonth = "Settembre";
+                break;
+            case 10:
+                printMonth = "Ottobre";
+                break;
+            case 11:
+                printMonth = "Novembre";
+                break;
+            case 12:
+                printMonth = "Dicembre";
+        }
+        const date = {
+            day: postDay,
+            month: postMonth,
+            year: postYear,
+            itaDate: postDay + " " + printMonth + " " + postYear
+        }
+        posts[i].newCreated = date;
+    }
+    posts.sort(compare);
+}
+// funzione per comparare gli elementi nell'array in base alla data
+function compare(a, b) {
+    if (a.newCreated.month < b.newCreated.month) {
+      return 1;
+    }
+    if (a.newCreated.month > b.newCreated.month) {
+      return -1;
+    }
+    if (a.newCreated.month == b.newCreated.month) {
+        if (a.newCreated.day < b.newCreated.day) {
+          return 1;
+        }
+        if (a.newCreated.day > b.newCreated.day) {
+          return -1;
+        }
+    }
+    return 0;
 }
