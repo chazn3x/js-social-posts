@@ -123,3 +123,13 @@ h1 {
     color: #0CD977;
     cursor: default;
 }
+
+
+
+
+.js-like-button {
+    background: none;
+    border: none;
+    font-size: 1em;
+    cursor: pointer;
+}

@@ -63,42 +63,43 @@ function popolateContainer() {
     const container = document.getElementById("container");
     let items = '';
     for (let i = 0; i < posts.length; i++) {
-        const {content, media, author, created,likes} = posts[i];
+        const {id, content, media, author, created,likes} = posts[i];
         const data = takeDate(created);
         const profileImage = takeProfileImage(author);
         items +=
         `<div class="post">
-        <div class="post__header">
-            <div class="post-meta">                    
-                <div class="post-meta__icon">
-                    ${profileImage}         
+            <div class="post__header">
+                <div class="post-meta">                    
+                    <div class="post-meta__icon">
+                        ${profileImage}         
+                    </div>
+                    <div class="post-meta__data">
+                        <div class="post-meta__author">${author.name}</div>
+                        <div class="post-meta__time">${data} mesi fa</div>
+                    </div>                    
                 </div>
-                <div class="post-meta__data">
-                    <div class="post-meta__author">${author.name}</div>
-                    <div class="post-meta__time">${data} mesi fa</div>
-                </div>                    
             </div>
-        </div>
-        <div class="post__text">${content}</div>
-        <div class="post__image">
-            <img src="${media}" alt="">
-        </div>
-        <div class="post__footer">
-            <div class="likes js-likes">
-                <div class="likes__cta">
-                    <a class="like-button  js-like-button" href="#" data-postid="1">
-                        <i class="like-button__icon fas fa-thumbs-up" aria-hidden="true"></i>
-                        <span class="like-button__label">Mi Piace</span>
-                    </a>
-                </div>
-                <div class="likes__counter">
-                    Piace a <b id="like-counter-1" class="js-likes-counter">${likes}</b> persone
-                </div>
-            </div> 
-        </div>            
-    </div>`;        
+            <div class="post__text">${content}</div>
+            <div class="post__image">
+                <img src="${media}" alt="">
+            </div>
+            <div class="post__footer">
+                <div class="likes js-likes">
+                    <div class="likes__cta">
+                        <button class="like-button  js-like-button" data-postid="${id}">
+                            <i class="like-button__icon fas fa-thumbs-up" aria-hidden="true"></i>
+                            <span class="like-button__label">Mi Piace</span>
+                        </button>
+                    </div>
+                    <div class="likes__counter">
+                        Piace a <b id="like-counter-${id}" class="js-likes-counter">${likes}</b> persone
+                    </div>
+                </div> 
+            </div>            
+        </div>`;
     }
     container.innerHTML = items;
+    addLikes();
 }
 
 // funzione per calcolare quanti mesi fa è stato pubblicato il post
@@ -123,4 +124,22 @@ function takeProfileImage(author) {
         return profileImage = `<div class="profile-pic-default"><span>${firstLetter + secondLetter}</span></div>`;
     }
     return profileImage = `<img class="profile-pic" src="${image}" alt="${name}">`;
+}
+// funzione per i mi piace
+function addLikes() {
+    const likeBtn = document.getElementsByClassName("like-button");
+    for (let i = 0; i < likeBtn.length; i++) {
+        likeBtn[i].addEventListener("click", function () {
+            const likeCounter = document.getElementById(`like-counter-${i + 1}`);
+            let likeInt = parseInt(likeCounter.innerHTML);
+            if (!(this.classList.contains("like-button--liked"))) {
+                this.classList.add("like-button--liked");
+                likeInt += 1;
+            } else {
+                this.classList.remove("like-button--liked");
+                likeInt -= 1;
+            }
+            likeCounter.innerHTML = likeInt;
+        });
+    }
 }
