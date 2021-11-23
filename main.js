@@ -65,7 +65,7 @@ post.addEventListener("click", function () {
     const newAuthor = {
         name: document.getElementById("new-author").innerHTML,
         image: null        };
-    const newId = posts.length + 1;
+    const newId = posts.length;
     const newContent = document.getElementById("new-post-text").value;
     const newMedia = null;
     const newLikes = 0;
