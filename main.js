@@ -64,8 +64,10 @@ const post = document.getElementById("create-post");
 post.addEventListener("click", function () {
     const newAuthor = {
         name: document.getElementById("new-author").innerHTML,
-        image: null        };
-    const newId = posts.length;
+        image: null
+    };
+    console.log(posts.length + 1);
+    const newId = posts.length + 1;
     const newContent = document.getElementById("new-post-text").value;
     const newMedia = null;
     const newLikes = 0;
@@ -141,17 +143,29 @@ post.addEventListener("click", function () {
     </div>`;
     const container = document.getElementById("container");
     container.prepend(newPostDiv);
-    addLikes();
+    const likeBtn = document.querySelector(`[data-postid="${newId}"]`);
+    likeBtn.addEventListener("click", function () {
+        const likeCounter = document.getElementById(`like-counter-${newId}`);
+        let likeInt = parseInt(likeCounter.innerHTML);
+        if (!(this.classList.contains("like-button--liked"))) {
+            this.classList.add("like-button--liked");
+            likeInt += 1;
+        } else {
+            this.classList.remove("like-button--liked");
+            likeInt -= 1;
+        }
+        likeCounter.innerHTML = likeInt;
+    });
     document.getElementById("new-post-text").value = "";
 });
 // funzione per inserire i post iniziali
 function popolateContainer() {
     const container = document.getElementById("container");
-    let items = '';
+    let item = '';
     for (let i = 0; i < posts.length; i++) {
         const {id, content, media, author, newCreated,likes} = posts[i];
         const profileImage = takeProfileImage(author);
-        items +=
+        item =
         `<div class="post">
             <div class="post__header">
                 <div class="post-meta">                    
@@ -182,8 +196,8 @@ function popolateContainer() {
                 </div> 
             </div>            
         </div>`;
+        container.innerHTML += item;
     }
-    container.innerHTML = items;
     addLikes();
 }
 // funzione per calcolare quanti mesi fa è stato pubblicato il post
@@ -205,7 +219,10 @@ function takeProfileImage(author) {
                 secondLetter = name[i + 1];
             }
         }
-        return profileImage = `<div class="profile-pic-default"><span>${firstLetter + secondLetter}</span></div>`;
+        return profileImage = 
+        `<div class="profile-pic-default">
+            <span>${firstLetter + secondLetter}</span>
+        </div>`;
     }
     return profileImage = `<img class="profile-pic" src="${image}" alt="${name}">`;
 }
@@ -232,9 +249,10 @@ function addLikes() {
 function arrayReorder(posts) {
     for (let i = 0; i < posts.length; i++) {
         const {created} = posts[i];
-        const postYear = parseInt(created[0] + created[1] + created[2] + created[3]);
-        const postMonth = parseInt(created[5] + created[6]);
-        const postDay = parseInt(created[8] + created[9]);
+        const reverseDate = created.split("-").reverse();
+        const postYear = parseInt(reverseDate[2]);
+        const postMonth = parseInt(reverseDate[1]);
+        const postDay = parseInt(reverseDate[0]);
         let printMonth = '';
         switch (postMonth) {
             case 1:
